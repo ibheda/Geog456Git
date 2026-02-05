@@ -1,0 +1,343 @@
+{
+  "displayFieldName": "",
+  "fieldAliases": {
+    "FID": "FID",
+    "FEATURE_ID": "FEATURE_ID",
+    "FEATURE_NA": "FEATURE_NA",
+    "FEATURE_CL": "FEATURE_CL",
+    "STATE_ALPH": "STATE_ALPH",
+    "COUNTY_NAM": "COUNTY_NAM",
+    "PRIM_LAT_D": "PRIM_LAT_D",
+    "PRIM_LONG1": "PRIM_LONG1",
+    "ELEV_IN_M": "ELEV_IN_M",
+    "ELEV_IN_FT": "ELEV_IN_FT",
+    "MAP_NAME": "MAP_NAME",
+    "DATE_CREAT": "DATE_CREAT",
+    "DATE_EDITE": "DATE_EDITE",
+    "SHORT_NAME": "SHORT_NAME",
+    "GlobalID": "GlobalID"
+  },
+  "geometryType": "esriGeometryPoint",
+  "spatialReference": {
+    "wkid": 102100,
+    "latestWkid": 3857
+  },
+  "fields": [
+    {
+      "name": "FID",
+      "type": "esriFieldTypeOID",
+      "alias": "FID"
+    },
+    {
+      "name": "FEATURE_ID",
+      "type": "esriFieldTypeDouble",
+      "alias": "FEATURE_ID"
+    },
+    {
+      "name": "FEATURE_NA",
+      "type": "esriFieldTypeString",
+      "alias": "FEATURE_NA",
+      "length": 254
+    },
+    {
+      "name": "FEATURE_CL",
+      "type": "esriFieldTypeString",
+      "alias": "FEATURE_CL",
+      "length": 254
+    },
+    {
+      "name": "STATE_ALPH",
+      "type": "esriFieldTypeString",
+      "alias": "STATE_ALPH",
+      "length": 254
+    },
+    {
+      "name": "COUNTY_NAM",
+      "type": "esriFieldTypeString",
+      "alias": "COUNTY_NAM",
+      "length": 254
+    },
+    {
+      "name": "PRIM_LAT_D",
+      "type": "esriFieldTypeDouble",
+      "alias": "PRIM_LAT_D"
+    },
+    {
+      "name": "PRIM_LONG1",
+      "type": "esriFieldTypeDouble",
+      "alias": "PRIM_LONG1"
+    },
+    {
+      "name": "ELEV_IN_M",
+      "type": "esriFieldTypeDouble",
+      "alias": "ELEV_IN_M"
+    },
+    {
+      "name": "ELEV_IN_FT",
+      "type": "esriFieldTypeDouble",
+      "alias": "ELEV_IN_FT"
+    },
+    {
+      "name": "MAP_NAME",
+      "type": "esriFieldTypeString",
+      "alias": "MAP_NAME",
+      "length": 254
+    },
+    {
+      "name": "DATE_CREAT",
+      "type": "esriFieldTypeDate",
+      "alias": "DATE_CREAT",
+      "length": 8
+    },
+    {
+      "name": "DATE_EDITE",
+      "type": "esriFieldTypeDate",
+      "alias": "DATE_EDITE",
+      "length": 8
+    },
+    {
+      "name": "SHORT_NAME",
+      "type": "esriFieldTypeString",
+      "alias": "SHORT_NAME",
+      "length": 30
+    },
+    {
+      "name": "GlobalID",
+      "type": "esriFieldTypeString",
+      "alias": "GlobalID",
+      "length": 38
+    }
+  ],
+  "features": [
+    {
+      "attributes": {
+        "FID": 0,
+        "FEATURE_ID": 973340,
+        "FEATURE_NA": "Algonquin Peak",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.143664,
+        "PRIM_LONG1": -73.986536,
+        "ELEV_IN_M": 1559,
+        "ELEV_IN_FT": 5114,
+        "MAP_NAME": "North Elba",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": 1226448000000,
+        "SHORT_NAME": "Algonquin",
+        "GlobalID": "{B12D0BBF-2873-468B-8F1C-39753F9FAB41}"
+      },
+      "geometry": {
+        "x": -8236170.0291,
+        "y": 5487664.0226
+      }
+    },
+    {
+      "attributes": {
+        "FID": 1,
+        "FEATURE_ID": 973357,
+        "FEATURE_NA": "Mount Marcy",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.112554,
+        "PRIM_LONG1": -73.923476,
+        "ELEV_IN_M": 1629,
+        "ELEV_IN_FT": 5344,
+        "MAP_NAME": "Mount Marcy",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": 1246406400000,
+        "SHORT_NAME": "Mt Marcy",
+        "GlobalID": "{88E45BF1-0D70-441E-93F5-DD5588A70B26}"
+      },
+      "geometry": {
+        "x": -8229148.7455,
+        "y": 5482901.3205
+      }
+    },
+    {
+      "attributes": {
+        "FID": 2,
+        "FEATURE_ID": 973341,
+        "FEATURE_NA": "Basin Mountain",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.121164,
+        "PRIM_LONG1": -73.886253,
+        "ELEV_IN_M": 1471,
+        "ELEV_IN_FT": 4827,
+        "MAP_NAME": "Mount Marcy",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Basin Mtn",
+        "GlobalID": "{5F518632-B8D0-4D7A-9088-932A1202D4FE}"
+      },
+      "geometry": {
+        "x": -8224980.1916,
+        "y": 5484213.1398
+      }
+    },
+    {
+      "attributes": {
+        "FID": 3,
+        "FEATURE_ID": 973344,
+        "FEATURE_NA": "Boundary Peak",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.139775,
+        "PRIM_LONG1": -73.993758,
+        "ELEV_IN_M": 1471,
+        "ELEV_IN_FT": 4826,
+        "MAP_NAME": "North Elba",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Boundary Peak",
+        "GlobalID": "{E944A2CB-0CFE-4958-BD8B-71009E63B45B}"
+      },
+      "geometry": {
+        "x": -8236977.138,
+        "y": 5487094.9346
+      }
+    },
+    {
+      "attributes": {
+        "FID": 4,
+        "FEATURE_ID": 973347,
+        "FEATURE_NA": "Dix Mountain",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.082276,
+        "PRIM_LONG1": -73.786247,
+        "ELEV_IN_M": 1480,
+        "ELEV_IN_FT": 4857,
+        "MAP_NAME": "Dix Mountain",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Dix Mtn",
+        "GlobalID": "{AE7715EF-5F93-4D5A-BB3A-55FE7BD11204}"
+      },
+      "geometry": {
+        "x": -8213847.6152,
+        "y": 5478184.7393
+      }
+    },
+    {
+      "attributes": {
+        "FID": 5,
+        "FEATURE_ID": 973351,
+        "FEATURE_NA": "Gray Peak",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.111443,
+        "PRIM_LONG1": -73.934866,
+        "ELEV_IN_M": 1475,
+        "ELEV_IN_FT": 4840,
+        "MAP_NAME": "Mount Marcy",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Gray Peak",
+        "GlobalID": "{F81F800A-2528-4B37-9B06-6A68D80CFA8C}"
+      },
+      "geometry": {
+        "x": -8230427.4709,
+        "y": 5482722.8732
+      }
+    },
+    {
+      "attributes": {
+        "FID": 6,
+        "FEATURE_ID": 973353,
+        "FEATURE_NA": "Mount Haystack",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.105609,
+        "PRIM_LONG1": -73.90042,
+        "ELEV_IN_M": 1512,
+        "ELEV_IN_FT": 4960,
+        "MAP_NAME": "Mount Marcy",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Mt Haystack",
+        "GlobalID": "{CE699CA9-33BF-44F8-A625-A743F962DC82}"
+      },
+      "geometry": {
+        "x": -8226557.2441,
+        "y": 5481801.4151
+      }
+    },
+    {
+      "attributes": {
+        "FID": 7,
+        "FEATURE_ID": 973355,
+        "FEATURE_NA": "Iroquois Peak",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.136997,
+        "PRIM_LONG1": -73.998203,
+        "ELEV_IN_M": 1475,
+        "ELEV_IN_FT": 4840,
+        "MAP_NAME": "North Elba",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Iroquois Peak",
+        "GlobalID": "{BF34FAC1-C957-4C75-8A4A-28AFBA959373}"
+      },
+      "geometry": {
+        "x": -8237456.3793,
+        "y": 5486634.6035
+      }
+    },
+    {
+      "attributes": {
+        "FID": 8,
+        "FEATURE_ID": 973360,
+        "FEATURE_NA": "Mount Skylight",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.099499,
+        "PRIM_LONG1": -73.930699,
+        "ELEV_IN_M": 1500,
+        "ELEV_IN_FT": 4920,
+        "MAP_NAME": "Mount Marcy",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": null,
+        "SHORT_NAME": "Mt Skylight",
+        "GlobalID": "{898717F4-FF1D-43C1-B8B8-EFCDE74B7EE4}"
+      },
+      "geometry": {
+        "x": -8229954.2691,
+        "y": 5480872.7682
+      }
+    },
+    {
+      "attributes": {
+        "FID": 9,
+        "FEATURE_ID": 973364,
+        "FEATURE_NA": "Whiteface Mountain",
+        "FEATURE_CL": "Summit",
+        "STATE_ALPH": "NY",
+        "COUNTY_NAM": "Essex",
+        "PRIM_LAT_D": 44.36588,
+        "PRIM_LONG1": -73.902646,
+        "ELEV_IN_M": 1483,
+        "ELEV_IN_FT": 4867,
+        "MAP_NAME": "Lake Placid",
+        "DATE_CREAT": 317433600000,
+        "DATE_EDITE": 1226448000000,
+        "SHORT_NAME": "Whiteface Mtn",
+        "GlobalID": "{DF142462-A756-4B74-8E39-E6708F69802D}"
+      },
+      "geometry": {
+        "x": -8226805.0434,
+        "y": 5522240.0997
+      }
+    }
+  ]
+}
