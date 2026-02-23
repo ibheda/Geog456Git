@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW 4b</title>
+</head>
+<script src="usaaf.js"></script>
+<style>
+    #usaafTable td {
+        background-color: #6c0b0b;
+        color: #ffd6d6;               
+    }
+    #usaafTable th {
+        background-color: #333;
+        color: white;
+    }
+</style>
+<body>
+    <div id="map"></div>
+    <table id = "usaafTable">
+  <tr>
+    <th>Date</th>
+    <th>Theater</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+  </table>
+    <script>
+    var myTable = document.getElementById('usaafTable');
+
+    function popTable(feature){
+        var myRow = document.createElement('tr');
+        var myCell1 = document.createElement('td');
+        var myCell2 = document.createElement('td');
+        var myCell3 = document.createElement('td');
+        var date = feature.properties.date;
+        var theatre = feature.properties.theatre;
+        var desc = feature.properties.old_text
+        myCell1.innerHTML = date
+        myCell2.innerHTML = theatre
+        myCell3.innerHTML = desc
+
+        myRow.append(myCell1)
+        myRow.append(myCell2)
+        myRow.append(myCell3)
+        myTable.append(myRow)
+    }
+    
+    usaaf.features.forEach(function(feature) {
+            popTable(feature);
+        });
+    </script>
+</body>
+</html>
