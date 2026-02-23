@@ -7,14 +7,17 @@
 </head>
 <script src="usaaf.js"></script>
 <style>
-    #usaafTable td {
-        background-color: #6c0b0b;
-        color: #ffd6d6;               
-    }
-    #usaafTable th {
-        background-color: #333;
-        color: white;
-    }
+    table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
 </style>
 <body>
     <div id="map"></div>
@@ -41,10 +44,21 @@
         myCell2.innerHTML = theatre
         myCell3.innerHTML = desc
 
+
         myRow.append(myCell1)
         myRow.append(myCell2)
         myRow.append(myCell3)
         myTable.append(myRow)
+
+        if (date.includes("/42")) {
+            myRow.style.backgroundColor = "#E8F4F8";
+        } else if (date.includes("/43")) {
+            myRow.style.backgroundColor = "#FFF3CD";
+        } else if (date.includes("/44")) {
+            myRow.style.backgroundColor = "#D4EDDA";
+        } else if (date.includes("/45")) {
+            myRow.style.backgroundColor = "#E2D1F9";
+        }
     }
     
     usaaf.features.forEach(function(feature) {
