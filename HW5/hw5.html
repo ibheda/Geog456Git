@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW5</title>
+    
+    <!-- This link is provided my leaflet and is necessary in any document-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+</head>
+
+<!-- The below line is provided by leaflet to make the map work-->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+<!-- This is needed to insert the JSON that will be used lower in the code-->
+<script src="europePoints.js"></script>
+<style>
+    #myfirstmap { height: 550px; width: 550px}
+    .slider-container {
+    margin-right: 20px;
+    display: flex;
+    align-items: left;
+    flex-direction: column;
+}
+
+.slider {
+    width: 550px; 
+}
+
+.tick-container {
+    display: flex;
+    justify-content: space-between;
+    width: 550px;
+    margin-top: 5px;
+}
+
+.tick {
+    font-size: 12px; 
+    color: #888; 
+}
+</style>
+<body>
+    <h1>American Air Missions in Europe, WW2</h1>
+     <div class="slider-container">
+      <input type="range" min="1939" max="1945" value="2" class="slider" id="slider" oninput='moveSlider(this.value)'>
+          <div class="tick-container">
+              <span class="tick">1939</span>
+              <span class="tick">1940</span>
+              <span class="tick">1941</span>
+              <span class="tick">1942</span>
+              <span class="tick">1943</span>
+              <span class="tick">1944</span>
+              <span class="tick">1945</span>
+          </div>
+      </div>
+  
+    <div id="myfirstmap"></div>
+    <script>
+        var mymap = L.map('myfirstmap').setView([50.28504358269188, 16.57116990874384], 3.4);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(mymap);
+var layerGroup = L.layerGroup().addTo(mymap);
+
+var planeIcon = L.icon({
+    iconUrl: 'helldiver-top.png',
+    iconSize: [25, 25],
+    iconAnchor:[12.5, 12.5]
+});
+
+function moveSlider(selectedYear) {
+    layerGroup.clearLayers()
+
+    var geojson = L.geoJson(europePoints, {
+        filter: function(feature) {
+            var featureYear = feature.properties.date.substring(0, 4);
+            return featureYear == selectedYear
+        },
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: planeIcon});
+        }
+    });
+    layerGroup.addLayer(geojson)
+}
+
+moveSlider(1939);
+</script>
+</body>
+
+
+
+
+<body>
+    
+</body>
+</html>
