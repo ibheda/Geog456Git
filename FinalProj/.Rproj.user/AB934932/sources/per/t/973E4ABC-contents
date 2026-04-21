@@ -1,0 +1,19 @@
+library(sf)
+library(rnaturalearth)
+library(tmap)
+library(magrittr)
+library(tidyverse)
+
+airforceData <- read_sf("AirforceData/airforcePoints.geojson")
+world_basemap <- ne_countries(continent = "europe", scale = "medium", returnclass = "sf")
+world_basemap <- world_basemap %>% filter(sovereignt != "Russia")
+
+tm_shape(world_basemap) +
+  tm_polygons() +
+  tm_shape(euro_points) +
+  tm_dots()
+
+euro_points <- st_intersection(airforceData, st_geometry(world_basemap))
+
+
+write_sf(euro_points, "europePoints2.geojson")

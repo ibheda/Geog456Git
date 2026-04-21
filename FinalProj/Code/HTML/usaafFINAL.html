@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USAAF European Theater Missions</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        body { margin: 0; padding: 0; background-color: #f4ebd8; color: #2c241b; font-family: 'Lora', serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 15px 40px; background-color: #e6dac3; border-bottom: 2px solid #8b0000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; }
+        h1 { margin: 0; font-family: 'Cinzel', serif; font-size: 1.8rem; color: #1a1a1a; }
+        p.subtitle { margin: 5px 0 0 0; font-style: italic; color: #4a4a4a; }
+        
+        /* Layout Fixes applied here */
+        #main-container { display: flex; flex-grow: 1; position: relative; overflow: hidden; min-height: 0; }
+        #map { flex-grow: 1; background-color: #d1cbb8; z-index: 1; }
+        #story-panel { width: 350px; flex-shrink: 0; background-color: #fcf8f2; border-left: 2px solid #8b0000; overflow-y: auto; display: none; padding: 20px 0; box-shadow: -4px 0 6px rgba(0,0,0,0.1); z-index: 10; box-sizing: border-box; }
+        
+        .story-header { padding: 0 20px 10px 20px; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid #c4b59d; margin-bottom: 20px; color: #8b0000; }
+        .story-card { padding: 20px; margin: 0 20px 40px 20px; background: #fff; border: 1px solid #c4b59d; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease; opacity: 0.5; }
+        .story-card.active { opacity: 1; border-color: #8b0000; box-shadow: 0 4px 8px rgba(139,0,0,0.15); transform: scale(1.02); }
+        .story-date { font-weight: bold; color: #8b0000; font-size: 0.9rem; margin-bottom: 5px; }
+        .story-title { font-family: 'Cinzel', serif; font-size: 1.1rem; margin: 0 0 10px 0; }
+        .story-desc { font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+        /* Control Panel */
+        #controls { padding: 15px 40px; background-color: #e6dac3; border-top: 2px solid #8b0000; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; box-shadow: 0 -4px 6px rgba(0,0,0,0.1); z-index: 1000; }
+        .control-block { display: flex; flex-direction: column; gap: 5px; border-right: 2px solid #c4b59d; padding-right: 15px; }
+        .control-block:last-child { border-right: none; padding-right: 0; }
+        .control-row { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: bold; }
+        select { font-family: 'Lora', serif; padding: 4px; background-color: #fcf8f2; border: 1px solid #c4b59d; border-radius: 4px; cursor: pointer; max-width: 180px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #8b0000; min-width: 150px; }
+        input[type=checkbox], input[type=radio] { accent-color: #8b0000; cursor: pointer; }
+        
+        #toggle-story-btn { background-color: #8b0000; color: #fcf8f2; border: none; padding: 6px 12px; font-family: 'Cinzel', serif; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        #toggle-story-btn:hover { background-color: #4a0000; }
+
+        #month-display { font-size: 1.1rem; font-weight: bold; font-family: 'Cinzel', serif; min-width: 160px; text-align: right; }
+        .leaflet-popup-content-wrapper { background-color: #fcf8f2; color: #2c241b; font-family: 'Lora', serif; border-radius: 4px; border: 1px solid #c4b59d; }
+        .leaflet-popup-tip { background-color: #fcf8f2; }
+        .info.legend { background: #fcf8f2; padding: 10px; border: 1px solid #c4b59d; border-radius: 4px; font-family: 'Lora', serif; font-size: 0.85rem; color: #2c241b; box-shadow: 0 2px 4px rgba(0,0,0,0.2); max-height: 250px; overflow-y: auto; min-width: 120px; }
+        .info.legend h4 { margin: 0 0 5px 0; font-family: 'Cinzel', serif; border-bottom: 1px solid #c4b59d; padding-bottom: 3px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 4px; }
+        .legend-color { width: 15px; height: 15px; border-radius: 50%; border: 1px solid #4a0000; margin-right: 8px; display: inline-block; }
+        .gradient-bar { width: 100%; height: 15px; border: 1px solid #4a0000; border-radius: 3px; margin: 5px 0; background: linear-gradient(to right, #ffffcc, #41b6c4, #225ea8); }
+        .gradient-labels { display: flex; justify-content: space-between; font-size: 0.75rem; }
+        #error-msg { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>USAAF Operations in the European Theater</h1>
+        <p class="subtitle">An interactive archive of American air campaigns during WWII.</p>
+    </header>
+
+    <div id="main-container">
+        <div id="map"></div>
+        
+        <div id="story-panel">
+            <div class="story-header">Historical Milestones</div>
+            <div id="story-content"></div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <div class="control-block">
+            <div class="control-row">
+                <label><input type="radio" name="main-mode" value="points" checked> Map Missions</label>
+                <label style="margin-left: 10px;"><input type="radio" name="main-mode" value="paths"> Map Paths</label>
+            </div>
+            <div class="control-row">
+                <label for="dataset-select">Data Source:</label>
+                <select id="dataset-select">
+                    <option value="euro">Descriptions (Euro Data)</option>
+                    <option value="thor">Statistics (THOR Data)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-block">
+            <div class="control-row">
+                <label for="unit-select">Operating Unit:</label>
+                <select id="unit-select">
+                    <option value="All">All Units</option>
+                </select>
+            </div>
+            <div class="control-row" id="symbology-row" style="display: none;">
+                <label for="symbology-select">Color By:</label>
+                <select id="symbology-select">
+                    <option value="default">Default (Red)</option>
+                    <option value="target_class">Target Type</option>
+                    <option value="pri_desc">Target Priority</option>
+                    <option value="alt">Altitude (Continuous)</option>
+                    <option value="he_tons">HE Tons (Jenks Breaks)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-block" style="flex-grow: 1;">
+            <div class="control-row">
+                <strong>Timeline:</strong>
+                <input type="range" id="time-slider" min="0" max="100" value="0" disabled>
+            </div>
+            <div class="control-row">
+                <input type="checkbox" id="cumulative-toggle">
+                <label for="cumulative-toggle">Show Cumulative Progress</label>
+            </div>
+        </div>
+
+        <div class="control-block" style="border: none; align-items: flex-end;">
+            <div id="month-display" style="margin-bottom: 5px;">Loading Data...</div>
+            <button id="toggle-story-btn">📖 Open Historical Narrative</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+    
+    <script src="../../Data/europePoints.js"></script>
+    <script src="../../Data/thor.js"></script>
+    <script src="../../Data/euroPaths.js"></script>
+    <script src="../../Data/thorPaths.js"></script>
+    
+    <script>
+        window.onload = function() {
+            const displayEl = document.getElementById('month-display');
+
+            if (typeof europePoints === 'undefined' || typeof thor === 'undefined' || typeof euroPaths === 'undefined' || typeof thorPaths === 'undefined') {
+                displayEl.innerHTML = "<span id='error-msg'>Error: Missing data files.</span>";
+                return; 
+            }
+
+            const map = L.map('map').setView([48.0, 10.0], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 10
+            }).addTo(map);
+
+            let pointsLayerGroup = L.layerGroup().addTo(map);
+            let pathsLayerGroup = L.layerGroup().addTo(map);
+            
+            // --- NARRATIVE SCROLLYTELLING DATA ---
+            const historicalHighlights = [
+                { date: "1942-08-17", keyword: "Rouen", lat: 49.43, lng: 1.09, title: "First Heavy Bomber Attack", desc: "12 B-17s of the 97th Bomb Group launched the first USAAF heavy bomber attack from the UK against Western Europe, targeting the Rouen-Sotteville marshalling yards." },
+                { date: "1943-01-03", keyword: "Nazaire", lat: 47.28, lng: -2.20, title: "Formation Precision Bombing", desc: "During a strike on the Saint-Nazaire U-boat base in France, the VIII Bomber Command utilized 'formation' precision bombing instead of individual bombing for the first time." },
+                { date: "1943-05-18", keyword: "CBO", lat: 51.50, lng: -0.12, title: "CBO Plan Approved", desc: "The Combined Bomber Offensive (CBO) plan was officially approved, granting the Eighth Air Force authorization to proceed with its round-the-clock daylight strategic bombing campaign." },
+                { date: "1943-08-01", keyword: "Ploesti", lat: 44.93, lng: 26.03, title: "Operation TIDAL WAVE", desc: "177 B-24s conducted a highly dangerous, low-level strike against the vital oil refineries at Ploesti, Romania. The operation was costly, with 54 planes lost." },
+                { date: "1943-08-17", keyword: "Schweinfurt", lat: 50.04, lng: 10.22, title: "The Schweinfurt-Regensburg Mission", desc: "On the exact one-year anniversary of US heavy bomber operations, 315 B-17s launched a massive two-pronged attack to cripple aircraft complex and anti-friction bearing factories." },
+                { date: "1943-09-27", keyword: "Emden", lat: 53.36, lng: 7.20, title: "First H2S Radar Mission", desc: "Heavy bombers equipped with H2S radar flew the first large daylight mission against a cloud-covered target (the port area at Emden) using pathfinder aircraft." },
+                { date: "1943-12-01", keyword: "P-51", lat: 49.50, lng: 1.00, title: "Ninth Air Force Fighter Sweep", desc: "A sweep of 28 P-51 Mustangs over Northwest France marked the very first Ninth Air Force fighter operation launched from the UK." },
+                { date: "1944-05-07", keyword: "Berlin", lat: 52.52, lng: 13.40, title: "The 1,000 Bomber Milestone", desc: "A major milestone was reached when over 1,000 Eighth Air Force heavy bombers were airborne on a single day, dropping bombs on Berlin and industrial centers." },
+                { date: "1944-06-02", keyword: "FRANTIC", lat: 49.58, lng: 34.55, title: "Operation FRANTIC", desc: "The USAAF initiated shuttle-bombing missions. 130 B-17s bombed targets in Eastern Europe and then landed at Soviet bases (like Poltava) instead of returning to the UK." },
+                { date: "1944-06-06", keyword: "D-Day", lat: 49.33, lng: -0.87, title: "D-Day (Invasion of Normandy)", desc: "Reaching top operational strength, the Eighth Air Force dispatched over 1,700 heavy bombers to drop 3,596 tons of bombs on beach installations to support the Allied invasion." },
+                { date: "1944-08-31", keyword: "Bucharest", lat: 44.42, lng: 26.10, title: "Operation REUNION", desc: "As the Soviet Army entered Bucharest, 36 B-17s executed a massive airlift to safely evacuate US airmen who had been interned as POWs in Romania." },
+                { date: "1944-09-17", keyword: "MARKET", lat: 51.92, lng: 5.85, title: "Operation MARKET-GARDEN", desc: "16 fighter groups escorted the planes and gliders of the First Allied Airborne Army as they dropped 20,000 troops into the Netherlands." },
+                { date: "1944-12-23", keyword: "Bulge", lat: 50.00, lng: 5.71, title: "Battle of the Bulge Support", desc: "Following days of bad weather, hundreds of bombers and fighters took to the skies to hit rail bridges and supply lines to support US troops." },
+                { date: "1945-05-09", keyword: "Redeployment", lat: 52.48, lng: 1.05, title: "The First Redeployment", desc: "Following the cessation of hostilities in Europe, the 453rd Bomb Group departed Old Buckenham, the first bomb group to be redeployed by ship back to the US." }
+            ];
+
+            const storyContent = document.getElementById('story-content');
+            historicalHighlights.forEach((hw, index) => {
+                const card = document.createElement('div');
+                card.className = 'story-card';
+                card.dataset.index = index;
+                card.innerHTML = `<div class="story-date">${new Date(hw.date).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>
+                                  <h3 class="story-title">${hw.title}</h3>
+                                  <p class="story-desc">${hw.desc}</p>`;
+                storyContent.appendChild(card);
+            });
+
+            // --- SYMBOLOGY DATA PREP ---
+            let minAlt = Infinity, maxAlt = -Infinity;
+            let heValues = [];
+            let tgtTypes = new Set(), priTypes = new Set();
+
+            thor.features.forEach(f => {
+                let p = f.properties;
+                if (p.alt != null) { if (p.alt < minAlt) minAlt = p.alt; if (p.alt > maxAlt) maxAlt = p.alt; }
+                if (p.he_tons != null) heValues.push(p.he_tons);
+                if (p.target_class) tgtTypes.add(p.target_class);
+                if (p.pri_desc) priTypes.add(p.pri_desc);
+            });
+
+            const altScale = chroma.scale('YlGnBu').domain([minAlt, maxAlt]);
+            const heBreaks = chroma.limits(heValues, 'q', 5); 
+            const heScale = chroma.scale('OrRd').classes(heBreaks);
+            
+            let tgtColors = {}, priColors = {};
+            let tgtArray = Array.from(tgtTypes);
+            let priArray = Array.from(priTypes);
+            const tgtPalette = chroma.scale(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628"]).colors(tgtArray.length);
+            const priPalette = chroma.scale('Set1').colors(priArray.length);
+            
+            tgtArray.forEach((tgt, i) => tgtColors[tgt] = tgtPalette[i] ? tgtPalette[i] : chroma.random().hex());
+            priArray.forEach((pri, i) => priColors[pri] = priPalette[i] ? priPalette[i] : chroma.random().hex());
+
+            let legend = L.control({position: 'bottomright'});
+
+            // UI Elements
+            const slider = document.getElementById('time-slider');
+            const cumulativeToggle = document.getElementById('cumulative-toggle');
+            const unitSelect = document.getElementById('unit-select');
+            const datasetSelect = document.getElementById('dataset-select');
+            const symbologySelect = document.getElementById('symbology-select');
+            const symbologyRow = document.getElementById('symbology-row');
+            const modeRadios = document.getElementsByName('main-mode');
+            const storyPanel = document.getElementById('story-panel');
+            const toggleStoryBtn = document.getElementById('toggle-story-btn');
+
+            // --- DUAL-RESOLUTION TIMELINE PREP ---
+            let uniqueMonths = [];
+            let uniqueDays = [];
+            let activeTimeline = [];
+            
+            const monthsSet = new Set();
+            const daysSet = new Set();
+            
+            [europePoints, thor].forEach(dataset => {
+                dataset.features.forEach(f => {
+                    if (f.properties && f.properties.date) {
+                        monthsSet.add(f.properties.date.substring(0, 7));
+                        daysSet.add(f.properties.date); 
+                    }
+                });
+            });
+            uniqueMonths = Array.from(monthsSet).sort();
+            uniqueDays = Array.from(daysSet).sort();
+            activeTimeline = uniqueMonths; // Default to monthly
+            
+            if (activeTimeline.length > 0) { slider.max = activeTimeline.length - 1; slider.disabled = false; }
+
+            // --- NARRATIVE TOGGLE LOGIC ---
+            function checkNarrativeAvailability() {
+                const isEuroData = datasetSelect.value === 'euro';
+                const isPointsMode = document.querySelector('input[name="main-mode"]:checked').value === 'points';
+                
+                if (isEuroData && isPointsMode) {
+                    toggleStoryBtn.style.display = 'block';
+                } else {
+                    toggleStoryBtn.style.display = 'none';
+                    storyPanel.style.display = 'none';
+                    toggleStoryBtn.innerText = "📖 Open Historical Narrative";
+                }
+            }
+
+            toggleStoryBtn.addEventListener('click', () => {
+                if (storyPanel.style.display === 'none' || storyPanel.style.display === '') {
+                    storyPanel.style.display = 'block';
+                    toggleStoryBtn.innerText = "✖ Close Narrative";
+                    map.invalidateSize(); 
+                } else {
+                    storyPanel.style.display = 'none';
+                    toggleStoryBtn.innerText = "📖 Open Historical Narrative";
+                    map.invalidateSize();
+                }
+            });
+
+            // --- DEBOUNCED INTERSECTION OBSERVER FOR SCROLLING ---
+            let isObserverActive = true;
+            let scrollTimeout; 
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && isObserverActive) {
+                        
+                        document.querySelectorAll('.story-card').forEach(c => c.classList.remove('active'));
+                        entry.target.classList.add('active');
+
+                        clearTimeout(scrollTimeout);
+
+                        scrollTimeout = setTimeout(() => {
+                            const index = entry.target.dataset.index;
+                            const hw = historicalHighlights[index];
+
+                            unitSelect.value = "All";
+                            const targetMonth = hw.date.substring(0, 7);
+                            
+                            // Force monthly resolution for narrative view
+                            activeTimeline = uniqueMonths;
+                            slider.max = activeTimeline.length - 1;
+                            
+                            const monthIndex = activeTimeline.indexOf(targetMonth);
+                            
+                            if (monthIndex !== -1 && slider.value != monthIndex) {
+                                slider.value = monthIndex;
+                                updateMap(); 
+                            }
+
+                            map.flyTo([hw.lat, hw.lng], 6, { animate: true, duration: 1.5 });
+
+                            // Safely open the popup inside the LayerGroup
+                            setTimeout(() => {
+                                pointsLayerGroup.eachLayer(parentLayer => {
+                                    if (parentLayer.eachLayer) {
+                                        parentLayer.eachLayer(layer => {
+                                            let p = layer.feature?.properties;
+                                            if (p && p.date === hw.date && (p.text?.includes(hw.keyword) || p.location_name?.includes(hw.keyword))) {
+                                                layer.openPopup();
+                                            }
+                                        });
+                                    }
+                                });
+                            }, 500);
+                        }, 300);
+                    }
+                });
+            }, { root: storyPanel, threshold: 0.6 });
+
+            document.querySelectorAll('.story-card').forEach(card => observer.observe(card));
+
+            function updateUnitDropdown() {
+                checkNarrativeAvailability();
+                const currentMode = document.querySelector('input[name="main-mode"]:checked').value;
+                const currentData = datasetSelect.value;
+                
+                if (currentData === 'thor' && currentMode === 'points') {
+                    symbologyRow.style.display = 'flex';
+                } else {
+                    symbologyRow.style.display = 'none';
+                    symbologySelect.value = 'default'; 
+                }
+
+                let activeDataset = (currentMode === 'points') ? (currentData === 'euro' ? europePoints : thor) : (currentData === 'euro' ? euroPaths : thorPaths);
+                let unitKey = (currentData === 'euro') ? 'theatre' : 'naf';
+                const unitSet = new Set();
+                activeDataset.features.forEach(f => { if (f.properties && f.properties[unitKey]) unitSet.add(f.properties[unitKey]); });
+
+                unitSelect.innerHTML = '<option value="All">All Units</option>';
+                Array.from(unitSet).sort().forEach(unit => unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`);
+            }
+
+            // --- NEW: RESOLUTION SWITCHER ---
+            function updateSliderResolution() {
+                const currentMode = document.querySelector('input[name="main-mode"]:checked').value;
+                const selectedUnit = unitSelect.value;
+                const isPathAnimated = (currentMode === 'paths' && selectedUnit !== "All");
+
+                // Save current date so the slider stays in place
+                let currentDateStr = activeTimeline[slider.value] || "1942-08";
+
+                if (isPathAnimated) {
+                    activeTimeline = uniqueDays; 
+                } else {
+                    activeTimeline = uniqueMonths; 
+                    currentDateStr = currentDateStr.substring(0, 7); 
+                }
+
+                slider.max = activeTimeline.length - 1;
+
+                // Find closest index for the new timeline
+                let newIndex = activeTimeline.findIndex(d => d.startsWith(currentDateStr));
+                slider.value = newIndex !== -1 ? newIndex : 0;
+            }
+
+            function getFeatureColor(props, isCumulative) {
+                const sym = symbologySelect.value;
+                let color = "#8b0000"; 
+                if (datasetSelect.value === 'thor') {
+                    if (sym === 'alt' && props.alt != null) color = altScale(props.alt).hex();
+                    if (sym === 'he_tons' && props.he_tons != null) color = heScale(props.he_tons).hex();
+                    if (sym === 'target_class' && props.target_class) color = tgtColors[props.target_class] || '#ccc';
+                    if (sym === 'pri_desc' && props.pri_desc) color = priColors[props.pri_desc] || '#ccc';
+                }
+                return { radius: isCumulative ? 3 : 5, fillColor: color, color: "#2c241b", weight: 1, opacity: 1, fillOpacity: isCumulative ? 0.4 : 0.8 };
+            }
+
+            function updateLegend() {
+                map.removeControl(legend); 
+                const sym = symbologySelect.value;
+                if (sym === 'default' || datasetSelect.value !== 'thor') return;
+
+                legend.onAdd = function (map) {
+                    let div = L.DomUtil.create('div', 'info legend');
+                    if (sym === 'alt') {
+                        div.innerHTML = `<h4>Altitude (ft)</h4><div class="gradient-bar"></div><div class="gradient-labels"><span>${minAlt}</span><span>${maxAlt * 100}</span></div>`;
+                    } else if (sym === 'he_tons') {
+                        div.innerHTML = `<h4>HE Tons (Quantiles)</h4>`;
+                        for (let i = 0; i < heBreaks.length - 1; i++) {
+                            let rangeColor = heScale((heBreaks[i] + heBreaks[i+1])/2).hex();
+                            div.innerHTML += `<div class="legend-item"><i class="legend-color" style="background-color:${rangeColor}"></i> ${Math.round(heBreaks[i])} &ndash; ${Math.round(heBreaks[i + 1])}</div>`;
+                        }
+                    } else if (sym === 'pri_desc') {
+                        div.innerHTML = `<h4>Priority</h4>`;
+                        Object.keys(priColors).forEach(pri => div.innerHTML += `<div class="legend-item"><i class="legend-color" style="background-color:${priColors[pri]}"></i> ${pri}</div>`);
+                    } else if (sym === 'target_class') {
+                        div.innerHTML = `<h4>Target Type</h4>`;
+                        Object.keys(tgtColors).forEach(tgt => div.innerHTML += `<div class="legend-item"><i class="legend-color" style="background-color:${tgtColors[tgt]}"></i> ${tgt}</div>`);
+                    }
+                    return div;
+                };
+                legend.addTo(map);
+            }
+
+            function updateMap() {
+                pointsLayerGroup.clearLayers();
+                pathsLayerGroup.clearLayers();
+
+                const currentMode = document.querySelector('input[name="main-mode"]:checked').value;
+                const currentData = datasetSelect.value;
+                const selectedUnit = unitSelect.value;
+                const isCumulative = cumulativeToggle.checked;
+                const activeSymbology = symbologySelect.value;
+                const isPathAnimated = (currentMode === 'paths' && selectedUnit !== "All");
+
+                // Target variable updates for dual-resolution
+                const targetDate = activeTimeline[slider.value] || "1942-08";
+                const targetMonth = targetDate.substring(0, 7);
+
+                if (currentMode === 'paths' && !isPathAnimated) {
+                    slider.disabled = true; cumulativeToggle.disabled = true;
+                    displayEl.innerText = "Campaign Overview";
+                } else {
+                    slider.disabled = false; cumulativeToggle.disabled = false;
+                    const [year, month, day] = targetDate.split('-');
+                    
+                    if (isPathAnimated && day) {
+                        displayEl.innerText = new Date(year, month - 1, day).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    } else {
+                        displayEl.innerText = new Date(year, month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                    }
+                }
+
+                // DRAW PATHS
+                if (currentMode === 'paths') {
+                    if (isPathAnimated) {
+                        const activePoints = (currentData === 'euro') ? europePoints : thor;
+                        const unitKey = (currentData === 'euro') ? 'theatre' : 'naf';
+
+                        // Filter by EXACT DATE for smooth animation
+                        let pathPoints = activePoints.features.filter(f => {
+                            let props = f.properties;
+                            if (!props || !props.date || props[unitKey] !== selectedUnit) return false;
+                            return props.date <= targetDate; 
+                        });
+
+                        pathPoints.sort((a, b) => new Date(a.properties.date) - new Date(b.properties.date));
+                        const latlngs = pathPoints.map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0]]);
+
+                        if (latlngs.length > 1) {
+                            const dynamicLine = L.polyline(latlngs, { color: '#2b5c8f', weight: 3, opacity: 0.8 }).addTo(pathsLayerGroup);
+                            L.polylineDecorator(dynamicLine, {
+                                patterns: [{ offset: '10%', repeat: '75px', symbol: L.Symbol.arrowHead({pixelSize: 12, polygon: false, pathOptions: {stroke: true, color: '#1a3a5c', weight: 2}}) }]
+                            }).addTo(pathsLayerGroup);
+                            dynamicLine.bindPopup(`<strong>Campaign Path:</strong> ${selectedUnit} (Up to ${displayEl.innerText})`);
+                        }
+                    } else {
+                        const activePaths = (currentData === 'euro') ? euroPaths : thorPaths;
+                        const unitKey = (currentData === 'euro') ? 'theatre' : 'naf';
+                        
+                        const pathGeoJSON = L.geoJSON(activePaths.features, {
+                            style: { color: '#2b5c8f', weight: 3, opacity: 0.6 },
+                            onEachFeature: (f, layer) => layer.bindPopup(`<strong>Campaign Path:</strong> ${f.properties[unitKey]}`)
+                        }).addTo(pathsLayerGroup);
+
+                        pathGeoJSON.eachLayer(function(layer) {
+                            if (layer instanceof L.Polyline) {
+                                L.polylineDecorator(layer, {
+                                    patterns: [{ offset: '10%', repeat: '75px', symbol: L.Symbol.arrowHead({pixelSize: 12, polygon: false, pathOptions: {stroke: true, color: '#1a3a5c', weight: 2}}) }]
+                                }).addTo(pathsLayerGroup);
+                            }
+                        });
+                    }
+                }
+
+                // DRAW POINTS
+                if (currentMode === 'points') {
+                    const activePoints = (currentData === 'euro') ? europePoints : thor;
+                    const unitKey = (currentData === 'euro') ? 'theatre' : 'naf';
+
+                    const filteredPoints = activePoints.features.filter(f => {
+                        let props = f.properties;
+                        if (!props || !props.date) return false;
+                        if (selectedUnit !== "All" && props[unitKey] !== selectedUnit) return false;
+
+                        if (currentData === 'thor') {
+                            if (activeSymbology === 'alt' && props.alt == null) return false;
+                            if (activeSymbology === 'he_tons' && props.he_tons == null) return false;
+                        }
+
+                        const featureMonth = props.date.substring(0, 7);
+                        return isCumulative ? (featureMonth <= targetMonth) : (featureMonth === targetMonth);
+                    });
+
+                    L.geoJSON(filteredPoints, {
+                        pointToLayer: (f, latlng) => L.circleMarker(latlng, getFeatureColor(f.properties, isCumulative)),
+                        onEachFeature: (f, layer) => {
+                            let props = f.properties;
+                            let popup = `<strong>Date:</strong> ${props.date}<br>`;
+                            if (currentData === 'thor') {
+                                popup += `<strong>Unit:</strong> ${props.naf}<br><strong>Target:</strong> ${props.tgt_loc}, ${props.tgt_ctry} (${props.target_class})<br><hr><strong>Altitude:</strong> ${props.alt}<br><strong>Total Tonnage:</strong> ${props.tot_tons}<br><strong>High Explosive:</strong> ${props.he_tons}<br><strong>Priority:</strong> ${props.pri_desc}`;
+                            } else {
+                                if (props.theatre) popup += `<strong>Unit:</strong> ${props.theatre}<br>`;
+                                if (props.location_name) popup += `<strong>Location:</strong> ${props.location_name}<br>`;
+                                popup += `<hr><p>${props.text || 'No description available.'}</p>`;
+                            }
+                            layer.bindPopup(popup);
+                        }
+                    }).addTo(pointsLayerGroup);
+                }
+                
+                updateLegend();
+            }
+
+            // Listeners
+            modeRadios.forEach(r => r.addEventListener('change', () => { updateUnitDropdown(); updateSliderResolution(); updateMap(); }));
+            datasetSelect.addEventListener('change', () => { updateUnitDropdown(); updateSliderResolution(); updateMap(); });
+            unitSelect.addEventListener('change', () => { updateSliderResolution(); updateMap(); });
+            symbologySelect.addEventListener('change', updateMap);
+            slider.addEventListener('input', updateMap);
+            cumulativeToggle.addEventListener('change', updateMap);
+
+            updateUnitDropdown();
+            updateSliderResolution();
+            updateMap();
+        };
+    </script>
+</body>
+</html>

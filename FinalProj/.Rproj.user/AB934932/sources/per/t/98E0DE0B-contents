@@ -1,0 +1,47 @@
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(magrittr)
+library(tmap)
+
+df <- read_csv("/Users/ishanbheda/Downloads/school/Geog591/USAAF_in_WWII_Combat_Chronology_Database.csv")
+
+df$text %>% unique() %>% length()
+
+df_unique <- df %>%
+  distinct(text, .keep_all = TRUE)
+
+glimpse(df_unique)
+
+df_unique %>% count(theatre, sort = TRUE)
+df %<>%
+  filter(!is.na(longitude) & !is.na(latitude))
+
+my_sf <- st_as_sf(
+  df_unique, 
+  coords = c("longitude", "latitude"), # Make sure the longitude goes FIRST!
+  crs = 4326                # This tells R these are standard GPS coordinates (WGS84)
+)
+
+df_unique %<>% mutate(Date = ymd(date))
+world_basemap <- ne_countries(scale = "medium", returnclass = "sf")
+
+tm_shape(world_basemap) +
+  tm_polygons(fill = "lightgray", col = "white") + # In v4: fill is the inside, col is the border
+  
+  tm_shape(my_sf) +
+  tm_dots(
+    fill = "date",                                  # Color the inside of the dots by date
+    fill.scale = tm_scale_continuous(values = "viridis"), # v4 syntax for a continuous color palette
+    fill.legend = tm_legend(title = "Event Date"),        # v4 syntax for legend titles
+    size = 0.1,                                           # Adjust point size
+    fill_alpha = 0.7                                      # v4 syntax for transparency
+  ) +
+  tm_layout(
+    bg.color = "aliceblue"
+  )
+
+glimpse(world_basemap)
+glimpse(my_sf)
+my_sf %<>% select(-Date)
+write_sf(my_sf, "Downloads/school/Geog456/airforcePoints.geojson")
